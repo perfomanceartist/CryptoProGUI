@@ -14,7 +14,6 @@ class Client:
         namelist = []
         for i in range(1, self.certs.Count + 1):
             namelist.append(self.certs.Item(i).GetInfo(pycades.CAPICOM_CERT_INFO_SUBJECT_SIMPLE_NAME))
-        #print()
         return namelist
 
     def Connect(self, ip: str = "127.0.0.1", port : int = 9000):
@@ -35,33 +34,14 @@ class Client:
         signer = pycades.Signer()
         signer.Certificate = self.certs.Item(cert)
         if password:
-            signer.KeyPin = password
-        #signer.CheckCertificate = True        
+            signer.KeyPin = password    
 
         hashedData = pycades.HashedData()
         hashedData.Algorithm = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256
         hashedData.Hash(data)
 
-        #print("---Hash---")
-        #print(hashedData.Value)
-        #print("--------")
-
         signedData = pycades.SignedData()
         signature = signedData.SignHash(hashedData, signer, pycades.CADESCOM_CADES_BES)
-
-
-        #signedData = pycades.SignedData()
-        #signedData.Content = data
-        #signature = signedData.SignCades(signer, pycades.CADESCOM_CADES_BES) # :str
-
-        #hashedData = self.HashData(data, alg = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256)
-        #signedData = pycades.SignedData()
-        #signature = signedData.SignHash(hashedData, signer, pycades.CADESCOM_CADES_BES) # :str
-        #signedData.SignCades(signer, pycades.CADESCOM_CADES_BES) 
-        
-        #print("\n--Signature--")
-        #print(signature)
-        #print("----\n\n\n\n")
 
         return signature
 
@@ -70,9 +50,6 @@ class Client:
         hashedData = pycades.HashedData()
         hashedData.Algorithm = alg
         hashedData.Hash(data)
-        #print("\n--Hash-")
-        #print(hashedData.Value) # :str
-        #print("----\n")
         return hashedData
 
     def EncryptData(self, data : str, cert : int = 1) -> str:
@@ -83,10 +60,6 @@ class Client:
         envelopedData.Recipients.Add(cert)
 
         encryptedMessage = envelopedData.Encrypt(pycades.CADESCOM_ENCODE_BASE64)
-
-        #print("--Encrypted Message--")
-        #print(encryptedMessage) # :str
-        #print("----")
 
         return encryptedMessage
 
