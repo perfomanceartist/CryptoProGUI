@@ -87,7 +87,7 @@ class PyCryptoGUI(QWidget):
     def printHash(self):
         data = self.textbox.toPlainText()
         b64hash = self.client.HashData(data).Value
-        QMessageBox.about(self, "Значения хеша", f"Ваше значение хеша:{b64hash}")
+        QMessageBox.about(self, "Значения хеша", f"Ваше значение хеша:\n{b64hash}")
 
     @pyqtSlot()
     def saveToFile(self):
@@ -114,10 +114,7 @@ class PyCryptoGUI(QWidget):
 
 
     @pyqtSlot()
-    def sendText(self):    
-        if self.client.Connect() is False:
-            QMessageBox.about(self, "Ошибка", "Не удается подключиться к серверу")
-            return
+    def sendText(self):
 
         need_sign = self.checkboxSign.isChecked()
         need_encrypt = self.checkboxEncrypt.isChecked()
@@ -129,6 +126,10 @@ class PyCryptoGUI(QWidget):
                 return
         operated = self.operateText(need_sign, need_encrypt, password=password)
 
+            
+        if self.client.Connect() is False:
+            QMessageBox.about(self, "Ошибка", "Не удается подключиться к серверу")
+            return
         answer = self.client.SendData(operated)
         QMessageBox.about(self, "Ответ сервера", answer)
 

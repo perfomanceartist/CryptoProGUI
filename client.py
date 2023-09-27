@@ -30,31 +30,49 @@ class Client:
         answer = self.socket.recv(1024).decode()
         return f"Server responce: {answer}"
 
-    def SignData(self, data : str, cert : int = 1, password=None) -> str:
+    def SignData(self, data : str, cert : int = 1, password=None) -> str:  
         "Возвращает подпись"
         signer = pycades.Signer()
         signer.Certificate = self.certs.Item(cert)
         if password:
             signer.KeyPin = password
-        signer.CheckCertificate = True        
+        #signer.CheckCertificate = True        
+
+        hashedData = pycades.HashedData()
+        hashedData.Algorithm = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256
+        hashedData.Hash(data)
+
+        #print("---Hash---")
+        #print(hashedData.Value)
+        #print("--------")
 
         signedData = pycades.SignedData()
-        signature = signedData.SignHash(data, signer, pycades.CADESCOM_CADES_BES) # :str
+        signature = signedData.SignHash(hashedData, signer, pycades.CADESCOM_CADES_BES)
+
+
+        #signedData = pycades.SignedData()
+        #signedData.Content = data
+        #signature = signedData.SignCades(signer, pycades.CADESCOM_CADES_BES) # :str
+
+        #hashedData = self.HashData(data, alg = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256)
+        #signedData = pycades.SignedData()
+        #signature = signedData.SignHash(hashedData, signer, pycades.CADESCOM_CADES_BES) # :str
+        #signedData.SignCades(signer, pycades.CADESCOM_CADES_BES) 
         
-        print("\n--Signature--")
-        print(signature)
-        print("----\n\n\n\n")
+        #print("\n--Signature--")
+        #print(signature)
+        #print("----\n\n\n\n")
 
         return signature
 
-    def HashData(self, data : str, alg = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411) -> str:
+    def HashData(self, data : str, alg = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256) -> str:
         "Возвращает хеш"
         hashedData = pycades.HashedData()
         hashedData.Algorithm = alg
         hashedData.Hash(data)
-        print("\n--Hash-")
-        print(hashedData.Value) # :str
-        print("----\n")
+        #print("\n--Hash-")
+        #print(hashedData.Value) # :str
+        #print("----\n")
         return hashedData
 
     def EncryptData(self, data : str, cert : int = 1) -> str:
@@ -66,9 +84,9 @@ class Client:
 
         encryptedMessage = envelopedData.Encrypt(pycades.CADESCOM_ENCODE_BASE64)
 
-        print("--Encrypted Message--")
-        print(encryptedMessage) # :str
-        print("----")
+        #print("--Encrypted Message--")
+        #print(encryptedMessage) # :str
+        #print("----")
 
         return encryptedMessage
 
